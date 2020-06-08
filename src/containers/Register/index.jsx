@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import FacebookIcon from "mdi-react/FacebookIcon";
 import GooglePlusIcon from "mdi-react/GooglePlusIcon";
 import RegisterForm from "./components/RegisterForm";
-import { isAuthenticated } from "../../auth/auth";
 
 const Register = () => {
   useEffect(() => {});

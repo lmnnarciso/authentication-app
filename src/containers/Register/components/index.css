@@ -1,0 +1,23 @@
+.alert-message__success {
+    display: flex;
+    justify-content: center;
+    background-color: chartreuse;
+    color: white;
+    border-radius: 4px;
+    margin-bottom: 0.55rem;
+}
+
+.alert-message__fail {
+    display: flex;
+    justify-content: center;
+    background-color: red;
+    color: white;
+    border-radius: 4px;
+    margin-bottom: 0.55rem;
+}
+
+.alert-message__success > h1,
+.alert-message__fail > h1 {
+    color: black;
+    font-size: 1.5rem;
+}

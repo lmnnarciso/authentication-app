@@ -5,7 +5,8 @@ import AccountOutlineIcon from "mdi-react/AccountOutlineIcon";
 import { Link, Redirect } from "react-router-dom";
 import CheckBox from "../../../shared/components/form/CheckBox";
 import axios from "axios";
-import { setSession, isAuthenticated } from "../../../auth/auth";
+import { isAuthenticated } from "../../../auth/auth";
+import "./index.css";
 
 class RegisterForm extends PureComponent {
   constructor(props) {
@@ -13,6 +14,9 @@ class RegisterForm extends PureComponent {
     this.state = {
       showPassword: false,
       isRegisterSuccess: false,
+      isRegisterFail: false,
+      isRegisterLoading: false,
+      isRegisterIdle: false,
     };
   }
 
@@ -28,13 +32,37 @@ class RegisterForm extends PureComponent {
   }
 
   render() {
-    const { showPassword, authenticated } = this.state;
+    const {
+      showPassword,
+      isRegisterFail,
+      isRegisterSuccess,
+      authenticated,
+    } = this.state;
     if (authenticated) {
       return <Redirect to="/pages/one" />;
     }
+
+    let warningMessage = (
+      <div className="alert-message__fail">
+        <h1>Registration failed</h1>
+      </div>
+    );
+
+    let successMessage = (
+      <div className="alert-message__success">
+        <h1>Registration succeeded</h1>
+      </div>
+    );
     return (
       <div>
-        {this.state.isRegisterSuccess ? "Successfully registered" : undefined}
+        {(() => {
+          if (isRegisterSuccess) {
+            return <>{successMessage}</>;
+          }
+          if (isRegisterFail) {
+            return <>{warningMessage}</>;
+          }
+        })()}
         <form className="form">
           <div className="form__form-group">
             <span className="form__form-group-label">Username</span>
@@ -105,14 +133,39 @@ class RegisterForm extends PureComponent {
                 .post("http://localhost:4000/users", data)
                 .then((response) => {
                   // response
+                  console.log("response", !response.data.errors);
                   if (response.data) {
                     if (response.data.token) {
                       // setSession(response.data.user.email, response.data.token);
+                      this.setState(
+                        {
+                          isRegisterSuccess: true,
+                          isRegisterFail: false,
+                        },
+                        () => {
+                          document.getElementsByName("name")[0].value = "";
+                          document.getElementsByName("email")[0].value = "";
+                          document.getElementsByName("password")[0].value = "";
+                        }
+                      );
+                    } else {
                       this.setState({
-                        isRegisterSuccess: true,
+                        isRegisterFail: true,
+                        isRegisterSuccess: false,
                       });
                     }
+                  } else {
+                    this.setState({
+                      isRegisterFail: true,
+                      isRegisterSuccess: false,
+                    });
                   }
+                })
+                .catch((e) => {
+                  this.setState({
+                    isRegisterFail: true,
+                    isRegisterSuccess: false,
+                  });
                 });
             }}
           >

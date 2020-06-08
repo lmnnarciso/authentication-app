@@ -86,7 +86,7 @@ class LogInForm extends PureComponent {
           onClick={(e) => {
             e.preventDefault();
             let data = {
-              email: document.getElementsByName("name")[0].value,
+              name: document.getElementsByName("name")[0].value,
               password: document.getElementsByName("password")[0].value,
             };
             axios
