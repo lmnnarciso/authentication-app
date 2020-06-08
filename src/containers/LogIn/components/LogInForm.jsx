@@ -1,0 +1,123 @@
+import React, { PureComponent } from "react";
+import EyeIcon from "mdi-react/EyeIcon";
+import KeyVariantIcon from "mdi-react/KeyVariantIcon";
+import AccountOutlineIcon from "mdi-react/AccountOutlineIcon";
+import { Link, Redirect } from "react-router-dom";
+import CheckBox from "../../../shared/components/form/CheckBox";
+import axios from "axios";
+import { setSession, isAuthenticated } from "../../../auth/auth";
+
+class LogInForm extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+      showPassword: false,
+      authenticated: false,
+    };
+  }
+
+  showPassword = (e) => {
+    e.preventDefault();
+    this.setState((prevState) => ({ showPassword: !prevState.showPassword }));
+  };
+
+  componentDidMount() {
+    if (isAuthenticated()) {
+      console.log("authenticated", isAuthenticated());
+    }
+  }
+
+  render() {
+    const { showPassword, authenticated } = this.state;
+    if (authenticated) {
+      return <Redirect to="/pages/one" />;
+    }
+    return (
+      <form className="form">
+        <div className="form__form-group">
+          <span className="form__form-group-label">Username</span>
+          <div className="form__form-group-field">
+            <div className="form__form-group-icon">
+              <AccountOutlineIcon />
+            </div>
+            <input name="name" type="text" placeholder="Name" />
+          </div>
+        </div>
+        <div className="form__form-group">
+          <span className="form__form-group-label">Password</span>
+          <div className="form__form-group-field">
+            <div className="form__form-group-icon">
+              <KeyVariantIcon />
+            </div>
+            <input
+              name="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+            />
+            <button
+              className={`form__form-group-button${
+                showPassword ? " active" : ""
+              }`}
+              onClick={(e) => this.showPassword(e)}
+              type="button"
+            >
+              <EyeIcon />
+            </button>
+          </div>
+          <div className="account__forgot-password">
+            <a href="/">Forgot a password?</a>
+          </div>
+        </div>
+        <div className="form__form-group">
+          <div className="form__form-group-field">
+            <CheckBox
+              name="remember_me"
+              label="Remember me"
+              value="on"
+              onChange={() => {}}
+            />
+          </div>
+        </div>
+        {/* <Link className="btn btn-primary account__btn account__btn--small" to="/pages/one">Sign In</Link> */}
+        <button
+          type="submit"
+          // console.log("docu.", document.getElementsByName("email")[0]);
+          className="btn btn-outline-primary account__btn account__btn--small"
+          onClick={(e) => {
+            e.preventDefault();
+            let data = {
+              email: document.getElementsByName("name")[0].value,
+              password: document.getElementsByName("password")[0].value,
+            };
+            axios
+              .post("http://localhost:4000/users/login", data)
+              .then((response) => {
+                // response
+                console.log("responseeee", response.data);
+                if (response.data) {
+                  if (response.data.token) {
+                    setSession(response.data.user.email, response.data.token);
+                    this.setState({
+                      authenticated: true,
+                    });
+
+                    // this.props.history.push("/");
+                  }
+                }
+              });
+          }}
+        >
+          Sign In
+        </button>
+        <Link
+          className="btn btn-outline-primary account__btn account__btn--small"
+          to="/register"
+        >
+          Create Account
+        </Link>
+      </form>
+    );
+  }
+}
+
+export default LogInForm;
